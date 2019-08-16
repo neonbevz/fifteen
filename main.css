@@ -97,13 +97,17 @@ body {
     -moz-appearance: none;
 }
 
-/*.game-cell__image {*/
-    /*position: absolute;*/
-    /*top:0;*/
-    /*left: 0;*/
-    /*height: 100%;*/
-    /*width: 100%;*/
+.game-cell:focus, .game-cell_empty:focus {
+    outline: none;
+}
 
-    /*background: url("resources/images/cell-outline.svg");*/
-    /*background-size: cover;*/
+/*.game-cell__image {*/
+/*position: absolute;*/
+/*top:0;*/
+/*left: 0;*/
+/*height: 100%;*/
+/*width: 100%;*/
+
+/*background: url("resources/images/cell-outline.svg");*/
+/*background-size: cover;*/
 /*}*/

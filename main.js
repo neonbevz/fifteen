@@ -4,15 +4,19 @@
 let FieldWidth = 4;
 let FieldHeight = 4;
 
-let Field = [];
-
 
 //
 
-// Document elements
+// Variables
 
+
+let GameAnimationState = Object.freeze({"idle": 1, "animating": 2});
+
+let CurrentGameAnimationState = GameAnimationState.idle;
 
 let FieldElement;
+
+let Field = [];
 
 
 //
@@ -20,17 +24,30 @@ let FieldElement;
 // Element templates
 
 
-let CellTemplate = (cellValue) => `
-    <button class="game-cell">
+let CellTemplate = (cellId, cellValue) => `
+    <button id="${cellId}" class="game-cell" onclick="OnCellClick(this)">
         ${cellValue}
     </button>
 `;
 
-let EmptyCellTemplate = () => `
-    <button class="game-cell_empty">
+let EmptyCellTemplate = (cellId) => `
+    <button id="${cellId}" class="game-cell_empty">
         0
     </button>
 `;
+
+
+//
+
+// Cell class
+
+
+function Cell(cellId, value, element) {
+    this.cellId = cellId;
+    this.value = value;
+    this.element = element;
+}
+
 
 //
 
@@ -44,7 +61,6 @@ window.onload = function () {
 
 
 //
-
 
 
 function HtmlToElement(html) {
@@ -69,11 +85,11 @@ function ShuffleArray(a) {
 function FieldIsWinning(field) {
     let res = true;
     for (let i = 0; i < field.length - 1; i++) {
-        if (field[i] !== i + 1) {
+        if (field[i].value !== i + 1) {
             res = false;
         }
     }
-    if (field[field.length - 1] !== 0) {
+    if (field[field.length - 1].value !== 0) {
         res = false;
     }
 
@@ -98,28 +114,108 @@ function GenerateField() {
 
     ClearField();
 
-    Field = shuffled;
+    for (let y = 0; y < FieldHeight; y++) {
+        Field.push([]);
+
+        for (let x = 0; x < FieldWidth; x++) {
+            // Field[y].push(shuffled[y * FieldWidth + x]);
+            let id = y * FieldWidth + x;
+            let value = shuffled[id];
+
+            // Create HTML element
+
+            let cellHtml = value === 0 ? EmptyCellTemplate("cell-" + id) : CellTemplate("cell-" + id, value);
+            let cellElement = HtmlToElement(cellHtml);
+            FieldElement.appendChild(cellElement);
+
+            //
+
+            let newCell = new Cell(id, value, cellElement);
+            Field[y].push(newCell);
+        }
+    }
 
     RenderField();
 }
 
 
-
 function RenderField() {
-    for (let i = 0; i < Field.length; i++) {
-        let cellHtml;
-
-        if (Field[i] === 0) {
-            cellHtml = EmptyCellTemplate();
-        } else {
-            let cellValue = Field[i];
-            cellHtml = CellTemplate(cellValue);
-        }
-
-        let cellElement = HtmlToElement(cellHtml);
-        FieldElement.appendChild(cellElement);
-    }
+    // for (let y = 0; y < FieldHeight; y++) {
+    //     for (let x = 0; x < FieldWidth; x++) {
+    //         let cellHtml;
+    //
+    //         if (Field[y][x].value === 0) {
+    //             cellHtml = EmptyCellTemplate();
+    //         } else {
+    //             let cellValue = Field[y][x].value;
+    //             cellHtml = CellTemplate("cell-" +, cellValue);
+    //         }
+    //
+    //         let cellElement = HtmlToElement(cellHtml);
+    //         FieldElement.appendChild(cellElement);
+    //     }
+    // }
     // childNode[4].parentNode.insertBefore(childNode[4], childNode[3]);
 }
 
+
+/**
+ * @return {boolean}
+ */
+function OnCellClick(cell) {
+    let cellValue = parseInt(cell.innerHTML);
+    if (cellValue !== 0 && CurrentGameAnimationState === GameAnimationState.idle) {
+        let cellPositionX, cellPositionY;
+        for (let y = 0; y < FieldHeight; y++) {
+            for (let x = 0; x < FieldWidth; x++) {
+                if (Field[y][x].value === cellValue) {
+                    cellPositionX = x;
+                    cellPositionY = y;
+                    break;
+                }
+            }
+        }
+        let emptyNeighbor = FindEmptyNeighbor(cellPositionX, cellPositionY);
+
+        if (emptyNeighbor.length > 0) {
+            SwapCells([cellPositionX, cellPositionY], emptyNeighbor);
+        } else {
+            return false;
+        }
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+function FindEmptyNeighbor(cellPositionX, cellPositionY) {
+    if (cellPositionY > 0 && Field[cellPositionY - 1][cellPositionX].value === 0) {
+        return [cellPositionX, cellPositionY - 1];
+    } else if (cellPositionY < FieldHeight - 1 && Field[cellPositionY + 1][cellPositionX].value === 0) {
+        return [cellPositionX, cellPositionY + 1];
+    } else if (cellPositionX > 0 && Field[cellPositionY][cellPositionX - 1].value === 0) {
+        return [cellPositionX - 1, cellPositionY];
+    } else if (cellPositionX < FieldWidth - 1 && Field[cellPositionY][cellPositionX + 1].value === 0) {
+        return [cellPositionX + 1, cellPositionY];
+    } else {
+        return [];
+    }
+}
+
+
+function SwapCells(cellPosition, emptyCellPosition) {
+    let cell = Field[cellPosition[1]][cellPosition[0]];
+    let emptyCell = Field[emptyCellPosition[1]][emptyCellPosition[0]];
+
+    let temp = document.createElement("div");
+
+    cell.element.parentNode.insertBefore(temp, cell.element);
+    emptyCell.element.parentNode.insertBefore(cell.element, emptyCell.element);
+    temp.parentNode.insertBefore(emptyCell.element, temp);
+    temp.parentNode.removeChild(temp);
+
+    Field[cellPosition[1]][cellPosition[0]] = emptyCell;
+    Field[emptyCellPosition[1]][emptyCellPosition[0]] = cell;
+}
 

@@ -65,6 +65,31 @@ body {
     width: 80px;
     height: 80px;
 
+    background: transparent;
+
+    text-decoration: none;
+    border: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    overflow: visible;
+}
+
+.game-cell__animated-content {
+    width: 100%;
+    height: 100%;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    /*transition: top 1s, left 1s;*/
+    /*-moz-transition: top 1s, left 1s;*/
+    /*-webkit-transition:top 1s, left 1s;*/
+    /*-o-transition: top 1s, left 1s;*/
+
+    transform: translate(0, 0);
+    transition: transform .2s;
+
     background: url("resources/images/cell-bg.png");
     background-size: cover;
 
@@ -75,12 +100,8 @@ body {
     text-align: center;
     font-family: OldEnglishGothicPixel, serif;
     font-size: 40px;
+    line-height: 80px;
     color: var(--color-red);
-
-    text-decoration: none;
-    border: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
 }
 
 .game-cell_empty {

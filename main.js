@@ -121,7 +121,6 @@ function GenerateField() {
         Field.push([]);
 
         for (let x = 0; x < FieldWidth; x++) {
-            // Field[y].push(shuffled[y * FieldWidth + x]);
             let id = y * FieldWidth + x;
             let value = shuffled[id];
 
@@ -137,28 +136,6 @@ function GenerateField() {
             Field[y].push(newCell);
         }
     }
-
-    RenderField();
-}
-
-
-function RenderField() {
-    // for (let y = 0; y < FieldHeight; y++) {
-    //     for (let x = 0; x < FieldWidth; x++) {
-    //         let cellHtml;
-    //
-    //         if (Field[y][x].value === 0) {
-    //             cellHtml = EmptyCellTemplate();
-    //         } else {
-    //             let cellValue = Field[y][x].value;
-    //             cellHtml = CellTemplate("cell-" +, cellValue);
-    //         }
-    //
-    //         let cellElement = HtmlToElement(cellHtml);
-    //         FieldElement.appendChild(cellElement);
-    //     }
-    // }
-    // childNode[4].parentNode.insertBefore(childNode[4], childNode[3]);
 }
 
 
@@ -196,18 +173,13 @@ function OnCellClick(cell) {
  * @return {number}
  */
 function FindEmptyNeighbor(cellPositionX, cellPositionY) {
-    // console.log(cellPositionX, cellPositionY);
     if (cellPositionY > 0 && Field[cellPositionY - 1][cellPositionX].value === 0) {
-        // return [cellPositionX, cellPositionY - 1];
         return Direction.up;
     } else if (cellPositionY < FieldHeight - 1 && Field[cellPositionY + 1][cellPositionX].value === 0) {
-        // return [cellPositionX, cellPositionY + 1];
         return Direction.down;
     } else if (cellPositionX > 0 && Field[cellPositionY][cellPositionX - 1].value === 0) {
-        // return [cellPositionX - 1, cellPositionY];
         return Direction.left;
     } else if (cellPositionX < FieldWidth - 1 && Field[cellPositionY][cellPositionX + 1].value === 0) {
-        // return [cellPositionX + 1, cellPositionY];
         return Direction.right;
     } else {
         // return [];
